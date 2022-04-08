@@ -27,6 +27,10 @@ public class PlayerInputManager : MonoBehaviour
         var h = Input.GetAxisRaw("Horizontal");
         InputVector = Vector2.right * h;
         OnStayInput?.Invoke(InputType.Move);
+        if (Input.GetButtonDown("Jump"))
+        {
+            OnEnterInput?.Invoke(InputType.Jump);
+        }
     }
     public bool GetInput(InputType input)
     {

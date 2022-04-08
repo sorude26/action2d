@@ -17,14 +17,15 @@ public class MoveController : MonoBehaviour
     protected float _jumpSpeed = 10f;
     [SerializeField]
     protected float _gravityScale = 1f;
+    [SerializeField]
+    private WallChecker _groundChecker = default;
 
     private Rigidbody2D _rigidbody = default;
     private Vector2 _moveVector = default;
 
-    private float _jumpVector = default;
+    private float _jumpTimer = default;
 
     private bool _isJumping = false;
-    private bool _isGrounded = false;
     void Start()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
@@ -37,17 +38,35 @@ public class MoveController : MonoBehaviour
     }
     private void AddGravity()
     {
+        if (_isJumping) 
+        { 
+            _jumpTimer -= Time.deltaTime;
+            if (_jumpTimer <= 0)
+            {
+                _isJumping = false;
+            }
+            return; 
+        }
         _moveVector.y = _gravityScale * GRAVITY_POWER;
     }
     public void Move(Vector2 dir)
     {
+        if (!_groundChecker.IsWalled())
+        {
+            return;
+        }
         _moveVector.x = _moveSpeed * dir.x;
     }
-    public void Jump()
+    public void Jump(float time)
     {
+        if (!_groundChecker.IsWalled())
+        {
+            return;
+        }
         if (!_isJumping)
         {
             _isJumping = true;
+            _jumpTimer = time;
         }
         _moveVector.y = _jumpSpeed;
     }
