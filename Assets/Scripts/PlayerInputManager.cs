@@ -28,4 +28,8 @@ public class PlayerInputManager : MonoBehaviour
         InputVector = Vector2.right * h;
         OnStayInput?.Invoke(InputType.Move);
     }
+    public bool GetInput(InputType input)
+    {
+        return false;
+    }
 }

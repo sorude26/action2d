@@ -19,7 +19,12 @@ public class MoveController : MonoBehaviour
     protected float _gravityScale = 1f;
 
     private Rigidbody2D _rigidbody = default;
-    Vector2 _moveVector = default;
+    private Vector2 _moveVector = default;
+
+    private float _jumpVector = default;
+
+    private bool _isJumping = false;
+    private bool _isGrounded = false;
     void Start()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
@@ -40,6 +45,10 @@ public class MoveController : MonoBehaviour
     }
     public void Jump()
     {
+        if (!_isJumping)
+        {
+            _isJumping = true;
+        }
         _moveVector.y = _jumpSpeed;
     }
 }
