@@ -57,6 +57,10 @@ public class MoveController : MonoBehaviour
         }
         _moveVector.x = _moveSpeed * dir.x;
     }
+    public void DashMove(float dir)
+    {
+        _moveVector.x = _runSpeed * dir;
+    }
     public void Jump(float time)
     {
         if (!_groundChecker.IsWalled())
@@ -69,5 +73,17 @@ public class MoveController : MonoBehaviour
             _jumpTimer = time;
         }
         _moveVector.y = _jumpSpeed;
+    }
+    public void Jump(Vector2 dir)
+    {
+        if (!_groundChecker.IsWalled())
+        {
+            return;
+        }
+        if (!_isJumping)
+        {
+            _isJumping = true;
+        }
+        _moveVector = dir.normalized * _jumpSpeed;
     }
 }
