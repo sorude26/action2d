@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class FollowObject : MonoBehaviour
 {
+    #region SerializeField
     [SerializeField]
     Transform _followTarget = default;
     [SerializeField]
@@ -12,12 +13,16 @@ public class FollowObject : MonoBehaviour
     Transform _rotationTarget = default;
     [SerializeField]
     float _rotationSpeed = 1f;
+    #endregion
+
+    #region PrivateField
     bool _isFollow = false;
     Vector3 _followPos = default;
     float _maxY = default;
     float _minY = default;
     float _maxX = default;
     float _minX = default;
+    #endregion
     private void FixedUpdate()
     {
         if (!_isFollow) { return; }

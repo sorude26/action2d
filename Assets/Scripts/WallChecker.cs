@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class WallChecker : MonoBehaviour
 {
+    #region SerializeField
     [SerializeField]
     private Transform[] _checkPoints = default;
     [SerializeField]
@@ -12,7 +13,7 @@ public class WallChecker : MonoBehaviour
     private float _checkRange = 0.2f;
     [SerializeField]
     private LayerMask _layer = default;
-
+    #endregion
     public bool IsWalled(int maxHitCount = 1) 
     {
         int count = 0;

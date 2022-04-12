@@ -744,8 +744,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _followTarget: {fileID: 756255542}
-  _rotationTarget: {fileID: 756255542}
   _followSpeed: 1
+  _rotationTarget: {fileID: 756255542}
   _rotationSpeed: 1
 --- !u!4 &1455016592
 Transform:
