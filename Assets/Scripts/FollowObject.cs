@@ -23,6 +23,10 @@ public class FollowObject : MonoBehaviour
     float _maxX = default;
     float _minX = default;
     #endregion
+    private void Start()
+    {
+        StartFollow();
+    }
     private void FixedUpdate()
     {
         if (!_isFollow) { return; }

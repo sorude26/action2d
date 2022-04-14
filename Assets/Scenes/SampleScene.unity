@@ -395,10 +395,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxFallSpeed: 20
-  _moveSpeed: 20
-  _runSpeed: 6
+  _moveSpeed: 15
+  _runSpeed: 30
   _jumpSpeed: 30
-  _gravityScale: 1
+  _gravityScale: 2
+  _moveDecelerate: 0.5
+  _jumpDecelerate: 0.92
+  _flyDecelerate: 0.99
   _groundChecker: {fileID: 2139153043}
 --- !u!50 &756255539
 Rigidbody2D:
@@ -520,6 +523,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _moveController: {fileID: 756255538}
   _jumpTime: 0.3
+  _jumpStartTime: 0.05
 --- !u!1 &882331701
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,6 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum CharacterDirection
+{
+    Left,
+    Right,
+}
 [RequireComponent(typeof(Rigidbody2D))]
 public class MoveController : MonoBehaviour
 {
@@ -18,6 +23,13 @@ public class MoveController : MonoBehaviour
     [SerializeField]
     protected float _gravityScale = 1f;
     [SerializeField]
+    private float _moveDecelerate = 0.98f;
+    [SerializeField]
+    private float _jumpDecelerate = 0.98f;
+    [SerializeField]
+    private float _flyDecelerate = 0.98f;
+
+    [SerializeField]
     private WallChecker _groundChecker = default;
 
     private Rigidbody2D _rigidbody = default;
@@ -33,21 +45,34 @@ public class MoveController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        AddGravity();
-        _rigidbody.velocity = _moveVector;
+        MoveControl();
     }
     private void AddGravity()
     {
         if (_isJumping) 
         { 
             _jumpTimer -= Time.deltaTime;
-            if (_jumpTimer <= 0)
+            if (_jumpTimer < 0)
             {
                 _isJumping = false;
             }
+            _moveVector.y *= _jumpDecelerate;
             return; 
         }
         _moveVector.y = _gravityScale * GRAVITY_POWER;
+    }
+    private void MoveControl()
+    {
+        AddGravity();
+        _rigidbody.velocity = _moveVector;
+        if (!_groundChecker.IsWalled())
+        {
+            _moveVector.x *= _flyDecelerate;
+        }
+        else
+        {
+            _moveVector.x *= _moveDecelerate;
+        }
     }
     public void Move(Vector2 dir)
     {
@@ -61,18 +86,22 @@ public class MoveController : MonoBehaviour
     {
         _moveVector.x = _runSpeed * dir;
     }
-    public void Jump(float time)
+    public void StartJump()
     {
         if (!_groundChecker.IsWalled())
         {
             return;
         }
-        if (!_isJumping)
+        if (_isJumping)
         {
-            _isJumping = true;
-            _jumpTimer = time;
+            return;
         }
+        _isJumping = true;
         _moveVector.y = _jumpSpeed;
+    }
+    public void SetJumpTime(float time)
+    {
+        _jumpTimer = time;
     }
     public void Jump(Vector2 dir)
     {

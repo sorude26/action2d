@@ -8,25 +8,49 @@ public class PlayerController : MonoBehaviour
     private MoveController _moveController = default;
     [SerializeField]
     private float _jumpTime = 1f;
+    [SerializeField]
+    private float _jumpStartTime = 0.02f;
+    private float _jumpTimer = 0f;
+    private bool _isPlaying = false;
     private void Start()
     {
-        PlayerInputManager.OnStayInput += MoveInput;
-        PlayerInputManager.OnEnterInput += JumpInput;
+        //PlayerInputManager.OnStayInput += MoveInput;
+        //PlayerInputManager.OnEnterInput += JumpInput;
+        PlayerInputManager.SetEnterInput(InputType.Move,()=>MoveInput());
+        PlayerInputManager.SetEnterInput(InputType.Jump,()=>JumpInput());
+        PlayerInputManager.SetExitInput(InputType.Jump,()=>JumpExit());
     }
-    private void MoveInput(InputType input)
+    private void MoveInput()
     {
-        if(input != InputType.Move) { return; }
         if (_moveController != null)
         {
             _moveController.Move(PlayerInputManager.InputVector);
         }
     }
-    private void JumpInput(InputType input)
+    private void JumpInput()
     {
-        if (input != InputType.Jump) { return; }
         if (_moveController != null)
         {
-            _moveController.Jump(_jumpTime);
+            if (_isPlaying)
+            {
+                if (_jumpTimer < _jumpTime)
+                {
+                    _jumpTimer += Time.deltaTime;
+                    _moveController.SetJumpTime(_jumpTimer);
+                }
+            }
+            else
+            {
+                _isPlaying = true;
+                _jumpTimer = _jumpStartTime;
+                _moveController.SetJumpTime(_jumpTimer);
+                _moveController.StartJump();
+            }
         }
+    }
+    private void JumpExit()
+    {
+        _jumpTimer = 0;
+        _isPlaying = false;
     }
 }
