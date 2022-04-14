@@ -18,21 +18,29 @@ public enum InputType
 }
 public class PlayerInputManager : MonoBehaviour
 {
-    public static event Action<InputType> OnEnterInput = default;
-    public static event Action<InputType> OnStayInput = default;
-    public static event Action<InputType> OnExitInput = default;
-    private Dictionary<InputType, Action> _onEnterInputDic = default;
-    private Dictionary<InputType,Action> _onStayInputDic = default;
-    private Dictionary<InputType,Action> _onExitInputDic = default;
+    private static Dictionary<InputType, Action> _onEnterInputDic = default;
+    private static Dictionary<InputType, Action> _onStayInputDic = default;
+    private static Dictionary<InputType, Action> _onExitInputDic = default;
     public static Vector2 InputVector { get; private set; }
+    private void Awake()
+    {
+        StartSet();
+    }
     private void Update()
     {
-        var h = Input.GetAxisRaw("Horizontal");
-        InputVector = Vector2.right * h;
-        OnStayInput?.Invoke(InputType.Move);
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetButton("Horizontal"))
         {
-            OnEnterInput?.Invoke(InputType.Jump);
+            var h = Input.GetAxisRaw("Horizontal");
+            InputVector = Vector2.right * h;
+            _onEnterInputDic[InputType.Move]?.Invoke();
+        }
+        if (Input.GetButton("Jump"))
+        {
+            _onEnterInputDic[InputType.Jump]?.Invoke();
+        }
+        if (Input.GetButtonUp("Jump"))
+        {
+            _onExitInputDic[InputType.Jump]?.Invoke();
         }
     }
     private void StartSet()
@@ -40,24 +48,24 @@ public class PlayerInputManager : MonoBehaviour
         _onEnterInputDic = new Dictionary<InputType, Action>();
         _onStayInputDic = new Dictionary<InputType, Action>();
         _onExitInputDic = new Dictionary<InputType, Action>();
-        /*
-        for (int i = 0; i < System.Enum.GetValues(typeof(InputType)).Length; i++)
+        for (int i = 0; i < Enum.GetValues(typeof(InputType)).Length; i++)
         {
             _onEnterInputDic.Add((InputType)i, () => { });
+            _onStayInputDic.Add((InputType)i, () => { });
+            _onExitInputDic.Add((InputType)i, () => { });
         }
-        */
     }
-    public void SetEnterInput(InputType type,Action action)
+    public static void SetEnterInput(InputType type, Action action)
     {
-        _onEnterInputDic.Add(type, action);
+        _onEnterInputDic[type] += action;
     }
-    public void SetStayInput(InputType type,Action action)
+    public static void SetStayInput(InputType type, Action action)
     {
-        _onStayInputDic.Add(type, action);
+        _onStayInputDic[type] += action; 
     }
-    public void SetExitInput(InputType type,Action action)
+    public static void SetExitInput(InputType type, Action action)
     {
-        _onExitInputDic.Add(type, action);
+        _onExitInputDic[type] += action; 
     }
     public bool GetInput(InputType input)
     {
