@@ -15,6 +15,8 @@ public class PlayerController : MonoBehaviour
     private float _jumpTime = 1f;
     [SerializeField]
     private float _jumpStartTime = 0.02f;
+    [SerializeField]
+    private CharaDirection _startDir = CharaDirection.Right;
     private float _jumpTimer = 0f;
     private bool _isPlaying = false;
     private void Start()
@@ -24,15 +26,16 @@ public class PlayerController : MonoBehaviour
         PlayerInputManager.SetExitInput(InputType.Jump,()=>JumpExit());
         _moveController.OnChangeDirection += () =>
         {
-            if (_moveController.CurrentDirection == CharaDirection.Left)
+            if (_moveController.CurrentDirection == CharaDirection.Right)
             {
                 _characterBody.transform.localScale = Vector3.one;
             }
-            else if (_moveController.CurrentDirection == CharaDirection.Right)
+            else if (_moveController.CurrentDirection == CharaDirection.Left)
             {
                 _characterBody.transform.localScale = new Vector3(-1, 1, 1);
             }
         };
+        _moveController.SetStartDir(_startDir);
     }
     private void MoveInput()
     {

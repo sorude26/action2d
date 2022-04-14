@@ -63,8 +63,8 @@ public class MoveController : MonoBehaviour
         {
             if (value != _direction)
             {
-                OnChangeDirection?.Invoke();
                 _direction = value;
+                OnChangeDirection?.Invoke();
             }
         }
     }
@@ -198,5 +198,9 @@ public class MoveController : MonoBehaviour
     public void StartControl()
     {
         _isStoping = false;
+    }
+    public void SetStartDir(CharaDirection direction)
+    {
+        CurrentDirection = direction;
     }
 }
