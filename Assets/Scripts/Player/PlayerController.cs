@@ -2,10 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// PlayerëÄçÏópÉNÉâÉX
+/// </summary>
 public class PlayerController : MonoBehaviour
 {
     [SerializeField]
     private MoveController _moveController = default;
+    [SerializeField]
+    GameObject _characterBody = default;
     [SerializeField]
     private float _jumpTime = 1f;
     [SerializeField]
@@ -14,11 +19,20 @@ public class PlayerController : MonoBehaviour
     private bool _isPlaying = false;
     private void Start()
     {
-        //PlayerInputManager.OnStayInput += MoveInput;
-        //PlayerInputManager.OnEnterInput += JumpInput;
         PlayerInputManager.SetEnterInput(InputType.Move,()=>MoveInput());
         PlayerInputManager.SetEnterInput(InputType.Jump,()=>JumpInput());
         PlayerInputManager.SetExitInput(InputType.Jump,()=>JumpExit());
+        _moveController.OnChangeDirection += () =>
+        {
+            if (_moveController.CurrentDirection == CharaDirection.Left)
+            {
+                _characterBody.transform.localScale = Vector3.one;
+            }
+            else if (_moveController.CurrentDirection == CharaDirection.Right)
+            {
+                _characterBody.transform.localScale = new Vector3(-1, 1, 1);
+            }
+        };
     }
     private void MoveInput()
     {
