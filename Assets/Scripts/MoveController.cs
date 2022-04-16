@@ -8,8 +8,8 @@ using UnityEngine;
 /// </summary>
 public enum CharaDirection
 {
-    Left,
-    Right,
+    Left = -1,
+    Right = 1,
 }
 /// <summary>
 /// 移動制御用クラス
@@ -30,6 +30,9 @@ public class MoveController : MonoBehaviour
     /// <summary> ジャンプ速度 </summary>
     [SerializeField]
     protected float _jumpSpeed = 30f;
+    /// <summary> 壁ジャンプ速度 </summary>
+    [SerializeField]
+    protected float _wallJumpSpeed = 15f;
     /// <summary> 重力値 </summary>
     [SerializeField]
     protected float _gravityScale = 1f;
@@ -44,7 +47,16 @@ public class MoveController : MonoBehaviour
     private float _flyDecelerate = 0.98f;
     /// <summary> 接地判定 </summary>
     [SerializeField]
-    private WallChecker _groundChecker = default;
+    protected WallChecker _groundChecker = default;
+    /// <summary> 壁ジャンプの方向 </summary>
+    [SerializeField]
+    private Vector2 _wallJumpDir = Vector2.one;
+    /// <summary> 壁判定 </summary>
+    [SerializeField]
+    protected WallChecker _wallChecker = default;
+    /// <summary> 天井判定 </summary>
+    [SerializeField]
+    protected WallChecker _topChecker = default;
     #endregion
 
     private Rigidbody2D _rigidbody = default;
@@ -87,6 +99,10 @@ public class MoveController : MonoBehaviour
         { 
             _jumpTimer -= Time.deltaTime;
             if (_jumpTimer < 0)
+            {
+                _isJumping = false;
+            }
+            else if (_topChecker.IsWalled())
             {
                 _isJumping = false;
             }
@@ -151,6 +167,10 @@ public class MoveController : MonoBehaviour
     {
         if (!_groundChecker.IsWalled())
         {
+            if (_wallChecker && _wallChecker.IsWalled(CurrentDirection))
+            {
+                WallJump();
+            }
             return;
         }
         if (_isJumping)
@@ -169,21 +189,23 @@ public class MoveController : MonoBehaviour
         _jumpTimer = time;
     }
     /// <summary>
-    /// 指定方向へジャンプする
+    /// 壁ジャンプする
     /// </summary>
     /// <param name="dir"></param>
-    public void Jump(Vector2 dir)
+    public void WallJump()
     {
-        if (!_groundChecker.IsWalled())
+        if (CurrentDirection == CharaDirection.Left)
         {
-            return;
+            CurrentDirection = CharaDirection.Right;
         }
-        if (_isJumping)
+        else
         {
-            return;
+            CurrentDirection = CharaDirection.Left;
         }
         _isJumping = true;
-        _currentVelocity = dir.normalized * _jumpSpeed;
+        Vector2 jumpDir = _wallJumpDir;
+        jumpDir.x *= (int)CurrentDirection;
+        _currentVelocity = jumpDir.normalized * _wallJumpSpeed;
     }
     /// <summary>
     /// 移動制御を停止する
