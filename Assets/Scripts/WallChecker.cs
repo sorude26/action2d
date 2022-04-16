@@ -31,11 +31,31 @@ public class WallChecker : MonoBehaviour
     /// <returns></returns>
     public bool IsWalled()
     {
+        return IsWalled(_checkDir);
+    }
+    /// <summary>
+    /// キャラクターの向きに合わせた方向に壁判定があればtrueを返す
+    /// </summary>
+    /// <param name="direction"></param>
+    /// <returns></returns>
+    public bool IsWalled(CharaDirection direction)
+    {
+        Vector2 checkDir = _checkDir;
+        checkDir.x *= (int)direction;
+        return IsWalled(checkDir);
+    }
+    /// <summary>
+    /// 指定方向に壁判定があればtrueを返す
+    /// </summary>
+    /// <param name="dir"></param>
+    /// <returns></returns>
+    public bool IsWalled(Vector2 dir)
+    {
         int count = 0;
         foreach (Transform point in _checkPoints)
         {
             Vector2 start = point.position;
-            Vector2 end = start + _checkDir.normalized * _checkRange;
+            Vector2 end = start + dir.normalized * _checkRange;
             bool isHit = Physics2D.Linecast(start, end, _wallLayer);
             if (isHit)
             {
