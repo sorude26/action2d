@@ -93,7 +93,7 @@ public class MoveController : MonoBehaviour
     /// <summary>
     /// èdóÕåvéZ
     /// </summary>
-    private void AddGravity()
+    public void AddGravity()
     {
         if (_isJumping) 
         { 
@@ -111,10 +111,14 @@ public class MoveController : MonoBehaviour
         }
         _currentVelocity.y = _gravityScale * GRAVITY_POWER;
     }
+    public void AddGravityForJump()
+    {
+        _currentVelocity.y *= _jumpDecelerate;
+    }
     /// <summary>
     /// à⁄ìÆë¨ìxêßå‰
     /// </summary>
-    private void MoveControl()
+    public void MoveControl()
     {
         if (_isStoping)
         {
