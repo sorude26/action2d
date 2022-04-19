@@ -31,6 +31,7 @@ public partial class StateController : MonoBehaviour
     private MoveController _moveController = default;
 
     private IStateBase _currentState = default;
+    private StateType _currrentStateType = default;
     private float _stateTimer = default;
     private bool _isChangeState = default;
 
@@ -52,11 +53,30 @@ public partial class StateController : MonoBehaviour
             }
         }
     }
+    /// <summary>
+    /// ステートマシーン用インターフェース
+    /// </summary>
     private interface IStateBase
     {
+        /// <summary>
+        /// ステート開始時
+        /// </summary>
+        /// <param name="controller"></param>
         void OnEnter(StateController controller);
+        /// <summary>
+        /// ステートUpdate・判定
+        /// </summary>
+        /// <param name="controller"></param>
         void OnUpdate(StateController controller);
+        /// <summary>
+        /// ステート移動関係・判定
+        /// </summary>
+        /// <param name="controller"></param>
         void OnFixedUpdate(StateController controller);
+        /// <summary>
+        /// ステート終了時
+        /// </summary>
+        /// <param name="controller"></param>
         void OnLeave(StateController controller);
     }
     private void Start()
@@ -73,6 +93,29 @@ public partial class StateController : MonoBehaviour
     }
     private IStateBase GetState(StateType stateType)
     {
+        switch (stateType)
+        {
+            case StateType.Idle:
+                break;
+            case StateType.GroundMove:
+                break;
+            case StateType.Jump:
+                break;
+            case StateType.Fall:
+                break;
+            case StateType.WallShaving:
+                break;
+            case StateType.Landing:
+                break;
+            case StateType.Damage:
+                break;
+            case StateType.Down:
+                break;
+            case StateType.Action1:
+                break;
+            default:
+                break;
+        }
         return _currentState;
     }
     private bool IsGround()
@@ -92,5 +135,19 @@ public partial class StateController : MonoBehaviour
         _currentState.OnLeave(this);
         _currentState = GetState(nextState);
         _currentState.OnEnter(this);
+    }
+    public void Jump()
+    {
+        if (_currrentStateType == StateType.WallShaving)
+        {
+            _moveController.WallJump();
+            ChangeState(StateType.Jump);
+            return;
+        }
+        if (_groundChecker.IsWalled())
+        {
+            _moveController.StartJump();
+            ChangeState(StateType.Jump);
+        }
     }
 }

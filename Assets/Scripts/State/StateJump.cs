@@ -8,6 +8,7 @@ public partial class StateController
         private float _stateTimer = default;
         public void OnEnter(StateController controller)
         {
+            controller._currrentStateType = StateType.Jump;
             _stateTimer = controller._stateTimer;
         }
 

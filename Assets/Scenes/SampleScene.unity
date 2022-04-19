@@ -2964,7 +2964,7 @@ MonoBehaviour:
   _checkPoints:
   - {fileID: 1694854389}
   - {fileID: 208698028}
-  _checkDir: {x: 1, y: -0.5}
+  _checkDir: {x: 1, y: 0}
   _checkRange: 0.1
   _wallLayer:
     serializedVersion: 2

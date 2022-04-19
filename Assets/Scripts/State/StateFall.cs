@@ -8,6 +8,7 @@ public partial class StateController
     {
         public void OnEnter(StateController controller)
         {
+            controller._currrentStateType = StateType.Fall;
         }
 
         public void OnFixedUpdate(StateController controller)

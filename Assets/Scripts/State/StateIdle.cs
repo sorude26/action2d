@@ -8,6 +8,7 @@ public partial class StateController
     {
         public void OnEnter(StateController controller)
         {
+            controller._currrentStateType = StateType.Idle;
         }
 
         public void OnFixedUpdate(StateController controller)
@@ -24,7 +25,11 @@ public partial class StateController
 
         public void OnUpdate(StateController controller)
         {
-            if (controller.InputVector.x > 0 || controller.InputVector.x < 0)
+            if (controller.IsFrontWalled())
+            {
+                return;
+            }
+            if (Mathf.Abs(controller.InputVector.x) > 0)
             {
                 controller.ChangeState(StateType.GroundMove);
             }
