@@ -8,7 +8,8 @@ public enum StateType
     Idle,
     GroundMove,
     Jump,
-    Fly,
+    Fall,
+    WallShaving,
     Landing,
     Damage,
     Down,
@@ -32,6 +33,9 @@ public partial class StateController : MonoBehaviour
     private IStateBase _currentState = default;
     private float _stateTimer = default;
     private bool _isChangeState = default;
+
+    public Vector2 InputVector = default;
+
     /// <summary> キャラクター向き </summary>
     protected CharaDirection _direction;
     /// <summary> 向き変更時イベント </summary>
@@ -53,7 +57,7 @@ public partial class StateController : MonoBehaviour
         void OnEnter(StateController controller);
         void OnUpdate(StateController controller);
         void OnFixedUpdate(StateController controller);
-        IEnumerator OnLeave(StateController controller);
+        void OnLeave(StateController controller);
     }
     private void Start()
     {
@@ -71,14 +75,22 @@ public partial class StateController : MonoBehaviour
     {
         return _currentState;
     }
-    private IEnumerator ChangeState(StateType nextState)
+    private bool IsGround()
     {
-        yield return _currentState.OnLeave(this);
+        return _groundChecker.IsWalled();
+    }
+    private bool IsFrontWalled()
+    {
+        return _wallChecker.IsWalled(_direction);
+    }
+    private bool IsTopWalled()
+    {
+        return _topChecker.IsWalled();
+    }
+    public void ChangeState(StateType nextState)
+    {
+        _currentState.OnLeave(this);
         _currentState = GetState(nextState);
         _currentState.OnEnter(this);
-    }
-    public void StartChangeState(StateType nextState)
-    {
-        StartCoroutine(ChangeState(nextState));
     }
 }
