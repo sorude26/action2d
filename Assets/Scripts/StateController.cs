@@ -38,10 +38,12 @@ public partial class StateController : MonoBehaviour
     private StateIdle _sIdle = new StateIdle();
     private StateJump _sJump = new StateJump();
     private StateFall _sFall = new StateFall();
+    private StateDamage _sDamage = new StateDamage();
     private StateLanding _sLanding = new StateLanding();
     private StateGroundMove _sGroundMove = new StateGroundMove();
     private StateWallShaving _sWallShaving = new StateWallShaving();
     //-――――――――――――――
+
     public Vector2 InputVector = default;
     public event Action OnChangeState = default;
     /// <summary> 向き変更時イベント </summary>
