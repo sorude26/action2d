@@ -34,6 +34,11 @@ public class PlayerInputManager : MonoBehaviour
             InputVector = Vector2.right * h;
             _onEnterInputDic[InputType.Move]?.Invoke();
         }
+        else if(Input.GetButtonUp("Horizontal"))
+        {
+            InputVector = Vector2.zero;
+            _onExitInputDic[InputType.Move]?.Invoke();
+        }
         if (Input.GetButton("Jump"))
         {
             _onEnterInputDic[InputType.Jump]?.Invoke();

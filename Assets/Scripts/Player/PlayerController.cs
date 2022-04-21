@@ -8,9 +8,10 @@ using System.Threading.Tasks;
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
-    private const int AWIT_DELAY = 1000;
     [SerializeField]
     private MoveController _moveController = default;
+    [SerializeField]
+    private StateController _stateController = default;
     [SerializeField]
     GameObject _characterBody = default;
     [SerializeField]
@@ -18,17 +19,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float _jumpStartTime = 0.02f;
     [SerializeField]
-    private float _inputWaitTime = 0.2f;
-    [SerializeField]
     private CharaDirection _startDir = CharaDirection.Right;
     private float _jumpTimer = 0f;
-    private bool _isPlaying = false;
-    private bool _isWait = false;
+    private bool _isJump = false;
     private void Start()
     {
-        PlayerInputManager.SetEnterInput(InputType.Move,()=>MoveInput());
-        PlayerInputManager.SetEnterInput(InputType.Jump,()=>JumpInput());
-        PlayerInputManager.SetExitInput(InputType.Jump,()=>JumpExit());
+        PlayerInputManager.SetEnterInput(InputType.Move, () => InputMove());
+        PlayerInputManager.SetEnterInput(InputType.Jump, () => InputJump());
+        PlayerInputManager.SetExitInput(InputType.Move, () => InputMove());
+        PlayerInputManager.SetExitInput(InputType.Jump, () => ExitJump());
         _moveController.OnChangeDirection += () =>
         {
             if (_moveController.CurrentDirection == CharaDirection.Right)
@@ -41,46 +40,37 @@ public class PlayerController : MonoBehaviour
             }
         };
         _moveController.SetStartDir(_startDir);
+        _stateController.OnChangeState += () => ChangeState();
     }
-    private void MoveInput()
+    private void InputMove()
     {
-        if (_moveController != null)
+        _stateController.InputVector = PlayerInputManager.InputVector;
+    }
+    private void InputJump()
+    {
+        if (_stateController.CurrentState == StateType.Jump)
         {
-            _moveController.Move(PlayerInputManager.InputVector);
+            if (_jumpTimer > _jumpTime)
+            {
+                return;
+            }
+            _jumpTimer += Time.deltaTime;
+            _stateController.SetTimer(_jumpStartTime);
+        }
+        else if (!_isJump)
+        {
+            _isJump = true;
+            _jumpTimer = 0;
+            _stateController.SetTimer(_jumpStartTime);
+            _stateController.Jump();
         }
     }
-    private async void JumpInput()
+    private void ExitJump()
     {
-        if (_moveController != null)
-        {
-            if (_isPlaying)
-            {
-                if (_jumpTimer < _jumpTime)
-                {
-                    _jumpTimer += Time.deltaTime;
-                    _moveController.SetJumpTime(_jumpTimer);
-                }
-            }
-            else
-            {
-                if (_isWait)
-                {
-                    return;
-                }
-                _isWait = true;
-                _isPlaying = true;
-                _jumpTimer = _jumpStartTime;
-                _moveController.SetJumpTime(_jumpTimer);
-                _moveController.StartJump();
-                var wait = AWIT_DELAY * _inputWaitTime;
-                await Task.Delay((int)wait);
-                _isWait = false;
-            }
-        }
+        _isJump = false;
     }
-    private void JumpExit()
+    private void ChangeState()
     {
         _jumpTimer = 0;
-        _isPlaying = false;
     }
 }

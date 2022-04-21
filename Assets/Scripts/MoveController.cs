@@ -45,26 +45,15 @@ public class MoveController : MonoBehaviour
     /// <summary> 空中移動減速値 </summary>
     [SerializeField]
     private float _flyDecelerate = 0.98f;
-    /// <summary> 接地判定 </summary>
-    [SerializeField]
-    protected WallChecker _groundChecker = default;
     /// <summary> 壁ジャンプの方向 </summary>
     [SerializeField]
     private Vector2 _wallJumpDir = Vector2.one;
-    /// <summary> 壁判定 </summary>
-    [SerializeField]
-    protected WallChecker _wallChecker = default;
-    /// <summary> 天井判定 </summary>
-    [SerializeField]
-    protected WallChecker _topChecker = default;
     #endregion
 
     private Rigidbody2D _rigidbody = default;
     /// <summary> 現在の移動速度 </summary>
     private Vector2 _currentVelocity = default;
 
-    private float _jumpTimer = default;
-    private bool _isJumping = false;
     private bool _isStoping = false;
     private CharaDirection _direction;
 
@@ -86,29 +75,11 @@ public class MoveController : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody2D>();
     }
 
-    private void FixedUpdate()
-    {
-        MoveControl();
-    }
     /// <summary>
     /// 重力計算
     /// </summary>
     public void AddGravity()
     {
-        if (_isJumping) 
-        { 
-            _jumpTimer -= Time.deltaTime;
-            if (_jumpTimer < 0)
-            {
-                _isJumping = false;
-            }
-            else if (_topChecker.IsWalled())
-            {
-                _isJumping = false;
-            }
-            _currentVelocity.y *= _jumpDecelerate;
-            return; 
-        }
         _currentVelocity.y = _gravityScale * GRAVITY_POWER;
     }
     public void AddGravityForJump()
@@ -125,16 +96,19 @@ public class MoveController : MonoBehaviour
             _rigidbody.velocity = Vector2.zero;
             return;
         }
-        AddGravity();
         _rigidbody.velocity = _currentVelocity;
-        if (!_groundChecker.IsWalled())
-        {
-            _currentVelocity.x *= _flyDecelerate;
-        }
-        else
-        {
-            _currentVelocity.x *= _moveDecelerate;
-        }
+    }
+    public void MoveDecelerate()
+    {
+        _currentVelocity.x *= _moveDecelerate;
+    }
+    public void FlyDecelerate()
+    {
+        _currentVelocity.x *= _flyDecelerate;
+    }
+    public void StopMove()
+    {
+        _currentVelocity.x = 0;
     }
     /// <summary>
     /// 指定方向への移動を行う
@@ -142,10 +116,6 @@ public class MoveController : MonoBehaviour
     /// <param name="dir"></param>
     public void Move(Vector2 dir)
     {
-        if (!_groundChecker.IsWalled())
-        {
-            return;
-        }
         _currentVelocity.x = _moveSpeed * dir.x;
         if (dir.x > 0)
         {
@@ -169,29 +139,9 @@ public class MoveController : MonoBehaviour
     /// </summary>
     public void StartJump()
     {
-        if (!_groundChecker.IsWalled())
-        {
-            if (_wallChecker && _wallChecker.IsWalled(CurrentDirection))
-            {
-                WallJump();
-            }
-            return;
-        }
-        if (_isJumping)
-        {
-            return;
-        }
-        _isJumping = true;
         _currentVelocity.y = _jumpSpeed;
     }
-    /// <summary>
-    /// ジャンプ滞空時間を設定する
-    /// </summary>
-    /// <param name="time"></param>
-    public void SetJumpTime(float time)
-    {
-        _jumpTimer = time;
-    }
+
     /// <summary>
     /// 壁ジャンプする
     /// </summary>
@@ -206,7 +156,6 @@ public class MoveController : MonoBehaviour
         {
             CurrentDirection = CharaDirection.Left;
         }
-        _isJumping = true;
         Vector2 jumpDir = _wallJumpDir;
         jumpDir.x *= (int)CurrentDirection;
         _currentVelocity = jumpDir.normalized * _wallJumpSpeed;

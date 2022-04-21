@@ -13,6 +13,9 @@ public partial class StateController
 
         public void OnFixedUpdate(StateController controller)
         {
+            controller._moveController.AddGravity();
+            controller._moveController.MoveControl();
+            controller._moveController.MoveDecelerate();
             if (!controller.IsGround())
             {
                 controller.ChangeState(StateType.Fall);
@@ -25,10 +28,6 @@ public partial class StateController
 
         public void OnUpdate(StateController controller)
         {
-            if (controller.IsFrontWalled())
-            {
-                return;
-            }
             if (Mathf.Abs(controller.InputVector.x) > 0)
             {
                 controller.ChangeState(StateType.GroundMove);

@@ -33,26 +33,21 @@ public partial class StateController : MonoBehaviour
     private IStateBase _currentState = default;
     private StateType _currrentStateType = default;
     private float _stateTimer = default;
-    private bool _isChangeState = default;
 
+    //――――――STATE――――――
+    private StateIdle _sIdle = new StateIdle();
+    private StateJump _sJump = new StateJump();
+    private StateFall _sFall = new StateFall();
+    private StateLanding _sLanding = new StateLanding();
+    private StateGroundMove _sGroundMove = new StateGroundMove();
+    private StateWallShaving _sWallShaving = new StateWallShaving();
+    //-――――――――――――――
     public Vector2 InputVector = default;
-
-    /// <summary> キャラクター向き </summary>
-    protected CharaDirection _direction;
+    public event Action OnChangeState = default;
     /// <summary> 向き変更時イベント </summary>
     public event Action OnChangeDirection = default;
-    public CharaDirection CurrentDirection
-    {
-        get => _direction;
-        protected set
-        {
-            if (value != _direction)
-            {
-                _direction = value;
-                OnChangeDirection?.Invoke();
-            }
-        }
-    }
+    public StateType CurrentState { get => _currrentStateType; }
+
     /// <summary>
     /// ステートマシーン用インターフェース
     /// </summary>
@@ -81,7 +76,7 @@ public partial class StateController : MonoBehaviour
     }
     private void Start()
     {
-
+        _currentState = _sIdle;
     }
     private void Update()
     {
@@ -91,21 +86,40 @@ public partial class StateController : MonoBehaviour
     {
         _currentState.OnFixedUpdate(this);
     }
-    private IStateBase GetState(StateType stateType)
+    private bool IsGround()
     {
-        switch (stateType)
+        return _groundChecker.IsWalled();
+    }
+    private bool IsFrontWalled()
+    {
+        return _wallChecker.IsWalled(_moveController.CurrentDirection);
+    }
+    private bool IsTopWalled()
+    {
+        return _topChecker.IsWalled();
+    }
+    public void ChangeState(StateType nextState)
+    {
+        _currentState.OnLeave(this);
+        switch (nextState)
         {
             case StateType.Idle:
+                _currentState = _sIdle;
                 break;
             case StateType.GroundMove:
+                _currentState = _sGroundMove;
                 break;
             case StateType.Jump:
+                _currentState = _sJump;
                 break;
             case StateType.Fall:
+                _currentState = _sFall;
                 break;
             case StateType.WallShaving:
+                _currentState = _sWallShaving;
                 break;
             case StateType.Landing:
+                _currentState = _sLanding;
                 break;
             case StateType.Damage:
                 break;
@@ -116,24 +130,7 @@ public partial class StateController : MonoBehaviour
             default:
                 break;
         }
-        return _currentState;
-    }
-    private bool IsGround()
-    {
-        return _groundChecker.IsWalled();
-    }
-    private bool IsFrontWalled()
-    {
-        return _wallChecker.IsWalled(_direction);
-    }
-    private bool IsTopWalled()
-    {
-        return _topChecker.IsWalled();
-    }
-    public void ChangeState(StateType nextState)
-    {
-        _currentState.OnLeave(this);
-        _currentState = GetState(nextState);
+        OnChangeState?.Invoke();
         _currentState.OnEnter(this);
     }
     public void Jump()
@@ -144,10 +141,15 @@ public partial class StateController : MonoBehaviour
             ChangeState(StateType.Jump);
             return;
         }
-        if (_groundChecker.IsWalled())
+        if (_currrentStateType == StateType.Idle || _currrentStateType == StateType.GroundMove)
         {
             _moveController.StartJump();
             ChangeState(StateType.Jump);
+            return;
         }
+    }
+    public void SetTimer(float time)
+    {
+        _stateTimer = time;
     }
 }

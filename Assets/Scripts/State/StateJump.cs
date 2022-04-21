@@ -5,17 +5,16 @@ public partial class StateController
 {
     private class StateJump : IStateBase
     {
-        private float _stateTimer = default;
         public void OnEnter(StateController controller)
         {
             controller._currrentStateType = StateType.Jump;
-            _stateTimer = controller._stateTimer;
         }
 
         public void OnFixedUpdate(StateController controller)
         {
             controller._moveController.AddGravityForJump();
             controller._moveController.MoveControl();
+            controller._moveController.FlyDecelerate();
             if (controller.IsTopWalled())
             {
                 controller.ChangeState(StateType.Fall);
@@ -29,8 +28,8 @@ public partial class StateController
 
         public void OnUpdate(StateController controller)
         {
-            _stateTimer -= Time.deltaTime;
-            if (_stateTimer < 0)
+            controller._stateTimer -= Time.deltaTime;
+            if (controller._stateTimer < 0)
             {
                 controller.ChangeState(StateType.Fall);
             }

@@ -15,6 +15,7 @@ public partial class StateController
         {
             controller._moveController.AddGravity();
             controller._moveController.MoveControl();
+            controller._moveController.FlyDecelerate();
             if (controller.IsGround())
             {
                 controller.ChangeState(StateType.Landing);
